@@ -1,0 +1,80 @@
+#include <iostream>
+
+// Define a node structure to represent non-zero elements in the matrix
+struct MatrixNode {
+    int row;
+    int col;
+    int value;
+    MatrixNode* nextRow;
+    MatrixNode* nextCol;
+};
+
+// Define a LinkedList class to represent a sparse matrix using linked lists
+class SparseMatrix {
+public:
+    SparseMatrix(int rows, int cols) : rows(rows), cols(cols), head(nullptr) {}
+
+    // Function to insert a new element into the matrix
+    void insertElement(int row, int col, int value) {
+        MatrixNode* newNode = new MatrixNode{row, col, value, nullptr, nullptr};
+
+        // Insert into the row list
+        if (head == nullptr || row < head->row) {
+            newNode->nextRow = head;
+            head = newNode;
+        } else {
+            MatrixNode* currentRow = head;
+            while (currentRow->nextRow && row > currentRow->nextRow->row) {
+                currentRow = currentRow->nextRow;
+            }
+            newNode->nextRow = currentRow->nextRow;
+            currentRow->nextRow = newNode;
+        }
+
+        // Insert into the column list
+        if (head == nullptr || col < head->col) {
+            newNode->nextCol = head;
+            head = newNode;
+        } else {
+            MatrixNode* currentCol = head;
+            while (currentCol->nextCol && col > currentCol->nextCol->col) {
+                currentCol = currentCol->nextCol;
+            }
+            newNode->nextCol = currentCol->nextCol;
+            currentCol->nextCol = newNode;
+        }
+    }
+
+    // Function to print the entire sparse matrix
+    void printMatrix() {
+        MatrixNode* currentRow = head;
+        while (currentRow) {
+            MatrixNode* currentCol = currentRow;
+            while (currentCol) {
+                std::cout << "(" << currentCol->row << ", " << currentCol->col << "): " << currentCol->value << " ";
+                currentCol = currentCol->nextCol;
+            }
+            std::cout << std::endl;
+            currentRow = currentRow->nextRow;
+        }
+    }
+
+private:
+    int rows;
+    int cols;
+    MatrixNode* head;
+};
+
+int main() {
+    // Example usage
+    SparseMatrix sparseMat(3, 4);
+
+    // Inserting elements into the sparse matrix
+    sparseMat.insertElement(0, 1, 5);
+    sparseMat.insertElement(1, 2, 8);
+    sparseMat.insertElement(2, 0, 3);
+    sparseMat.insertElement(2, 3, 2);
+
+    // Printing the sparse matrix
+    std::cout << "Sparse Matrix:" << std::endl;
+    sparseMat.printMatrix();
